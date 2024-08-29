@@ -14,16 +14,15 @@ import { ScheduleAPI } from './v1/schedule';
 import { ReactionAPI } from './v1/reaction';
 import { InteractionAPI } from './v1/interaction';
 import { PinsMessageAPI } from './v1/pins-message';
+import { GroupAPI } from './v1/group';
+import { C2cAPI } from './v1/c2c';
 import { GuildPermissionsAPI } from './v1/guild-permission';
-
 export type OpenAPIRequest = <T extends Record<any, any> = any>(options: RequestOptions) => Promise<RestyResponse<T>>;
-
 export interface Config {
   appID: string;
   token: string;
   sandbox?: boolean;
 }
-
 export interface IOpenAPI {
   config: Config;
   request: OpenAPIRequest;
@@ -43,21 +42,18 @@ export interface IOpenAPI {
   reactionApi: ReactionAPI;
   interactionApi: InteractionAPI;
   pinsMessageApi: PinsMessageAPI;
+  groupApi: GroupAPI;
+  c2cApi: C2cAPI;
 }
-
 export type APIVersion = `v${number}`;
-
 export interface Token {
   appID: number;
   accessToken: string;
   type: string;
 }
-
-// WebsocketAPI websocket 接入地址
 export interface WebsocketAPI {
   ws: () => any;
 }
-
 export * from './v1/audio';
 export * from './v1/channel';
 export * from './v1/channel-permission';
@@ -73,4 +69,6 @@ export * from './v1/schedule';
 export * from './v1/reaction';
 export * from './v1/interaction';
 export * from './v1/pins-message';
+export * from './v1/group';
+export * from './v1/c2c';
 export * from './v1/guild-permission';

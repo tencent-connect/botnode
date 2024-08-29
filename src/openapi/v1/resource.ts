@@ -34,7 +34,13 @@ const apiMap = {
   pinsMessageIdURI: '/channels/:channelID/pins/:messageID',
   pinsMessageURI: '/channels/:channelID/pins',
   interactionURI: '/interactions/:interactionID',
-  guildVoiceMembersURI: '/channels/:channelID/voice/members', // 语音子频道在线成员车查询
-  botMic: '/channels/:channelID/mic', // 机器人上麦|下麦
+  guildVoiceMembersURI: '/channels/:channelID/voice/members',
+  botMic: '/channels/:channelID/mic',
+  c2cPostMessageURI: '/v2/users/:openid/messages',
+  c2cDelMessageURI: '/v2/users/:openid/messages/:message_id',
+  c2cFilesURI: '/v2/users/:openid/files',
+  groupPostMessageURI: '/v2/groups/:group_openid/messages',
+  groupDelMessageURI: '/v2/groups/:group_openid/messages/:message_id',
+  groupFilesURI: '/v2/groups/:group_openid/files',
 };
 export const getURL = (endpoint: keyof typeof apiMap) => apiMap[endpoint];

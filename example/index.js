@@ -45,11 +45,15 @@ ws.on('AUDIO_ACTION', (data) => {
 });
 ws.on('PUBLIC_GUILD_MESSAGES', async (eventData) => {
   console.log('[PUBLIC_GUILD_MESSAGES] 事件接收 :', eventData);
-  const {data} = await client.messageApi.postMessage('', {
+  const { data } = await client.messageApi.postMessage('', {
     content: 'test'
   })
   console.log(data);
 });
+ws.on("GROUP_AND_C2C_EVENT", (data) => {
+  console.log("[GROUP_AND_C2C_EVENT] 事件接收 :", data);
+});
+
 
 // client.guildApi.guild('').then((data) => {
 //   console.log(data);

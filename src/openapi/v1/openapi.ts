@@ -1,6 +1,7 @@
-/* eslint-disable prefer-promise-reject-errors */
 import { register } from '@src/openapi/openapi';
 import resty, { RequestOptions, RestyResponse } from 'resty-client';
+import C2c from './c2c';
+import Group from './group';
 import PinsMessage from './pins-message';
 import Reaction from './reaction';
 import Guild from './guild';
@@ -37,6 +38,8 @@ import {
   ReactionAPI,
   PinsMessageAPI,
   InteractionAPI,
+  GroupAPI,
+  C2cAPI,
 } from '@src/types';
 export const apiVersion = 'v1';
 export class OpenAPI implements IOpenAPI {
@@ -63,6 +66,8 @@ export class OpenAPI implements IOpenAPI {
   public reactionApi!: ReactionAPI;
   public interactionApi!: InteractionAPI;
   public pinsMessageApi!: PinsMessageAPI;
+  public groupApi!: GroupAPI;
+  public c2cApi!: C2cAPI;
   public guildPermissionsApi!: GuildPermissionsAPI;
 
   constructor(config: Config) {
@@ -71,7 +76,6 @@ export class OpenAPI implements IOpenAPI {
   }
 
   public register(client: IOpenAPI) {
-    // 注册聚合client
     client.guildApi = new Guild(this.request, this.config);
     client.channelApi = new Channel(this.request, this.config);
     client.meApi = new Me(this.request, this.config);
@@ -88,46 +92,36 @@ export class OpenAPI implements IOpenAPI {
     client.reactionApi = new Reaction(this.request, this.config);
     client.interactionApi = new Interaction(this.request, this.config);
     client.pinsMessageApi = new PinsMessage(this.request, this.config);
+    client.groupApi = new Group(this.request, this.config);
+    client.c2cApi = new C2c(this.request, this.config);
   }
-  // 基础rest请求
+
   public request<T extends Record<any, any> = any>(options: RequestOptions): Promise<RestyResponse<T>> {
     const { appID, token } = this.config;
-
     options.headers = { ...options.headers };
-
-    // 添加 UA
-    addUserAgent(options.headers);
-    // 添加鉴权信息
-    addAuthorization(options.headers, appID, token);
-    // 组装完整Url
+    addUserAgent(options.headers as any);
+    addAuthorization(options.headers as any, appID, token);
     const botUrl = buildUrl(options.url, this.config.sandbox);
-
-    // 简化错误信息，后续可考虑通过中间件形式暴露给用户自行处理
     resty.useRes(
       (result) => result,
       (error) => {
         let traceid = error?.response?.headers?.['x-tps-trace-id'];
+
         if (error?.response?.data) {
-          return Promise.reject({
-            ...error.response.data,
-            traceid,
-          });
+          return Promise.reject(new Error(JSON.stringify({ ...error.response.data, traceid })));
         }
+
         if (error?.response) {
-          return Promise.reject({
-            ...error.response,
-            traceid,
-          });
+          return Promise.reject(new Error(JSON.stringify({ ...error.response, traceid })));
         }
+
         return Promise.reject(error);
       },
     );
-
     const client = resty.create(options);
     return client.request<T>(botUrl!, options);
   }
 }
-
 export function v1Setup() {
   register(apiVersion, OpenAPI);
 }
